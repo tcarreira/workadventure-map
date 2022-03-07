@@ -1,16 +1,15 @@
 name: Optimize map and deploy
 
 on:
-  - push
+  push:
+    branches:
+      - main
 
 jobs:
-
   deploy:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -19,8 +18,8 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "14.x"
+          registry-url: "https://registry.npmjs.org"
 
       - name: "Install dependencies"
         run: npm install
@@ -31,25 +30,9 @@ jobs:
       - name: "Move scripts"
         run: mv dist/* .
 
-      - name: Bash
-        if: github.ref == 'refs/heads/master'
-        run: |
-          ls -al
-          git config --global user.email "d.negrier@thecodingmachine.com"
-          git config --global user.name "David Négrier"
-          git checkout master
-          git add .
-          git commit -am "Adding files"
-
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: . # The folder the action should deploy.
-          BASE_BRANCH: master
-
-      - name: Bash2
-        run: |
-          ls -al
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          keep_files: true
